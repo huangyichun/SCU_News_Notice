@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.mapper.NewsMapper">
+
+	<resultMap type="News" id="news">
+  		<id column="id" property="id"/>
+  		<result column="academyId" property="academyId"/>
+  		<result column="title" property="title"/>
+  		<result column="time" property="time"/>
+  		<result column="content" property="content"/>
+  		<result column="address" property="address"/>
+  		<result column="accessNum" property="accessNum"/>
+  	</resultMap>
+
+	<!-- 根据content查找新闻id -->
+	<select id="findNewsId" parameterType="String" resultType="int">
+		select id from news where content = #{content}
+	</select>
+
+	<!-- 根据学院id查找新闻条数 -->
+  	<select id="countNewsByAcademy" parameterType="int"
+  		resultType="int">
+  		select count(id) from news where academyId = #{academyId}
+  	</select>
+
+	<!-- 根据学院id查找最后一条新闻-->
+  	<select id="findOneNewsByAcademyId" parameterType="int"
+  		resultType="News">
+  		select * from news where id = (select max(id) from news where academyId=#{academyId})
+  	</select>
+
+	<!-- 根据学院id查找新闻,并且按新闻id从大到小排序-->
+  	<select id="findNewsByAcademyId" parameterType="int"
+  		resultType="News">
+  		select * from news where academyId = #{academyId} order by id desc
+  	</select>
+
+	<!--列出所有新闻信息 -->
+	<select id="listAllNews" resultType="News">
+		select * from news
+	</select>
+
+	<!--根据id获取新闻信息 -->
+	<select id="getNewsById" parameterType="int" resultType="News">
+		select
+		* from news where id=#{id};
+	</select>
+
+	<!--插入新闻信息 -->
+	<insert id="insertNews" parameterType="News">
+		insert into
+		news(academyId,title,time,content,address,pic,accessNum)
+		value(#{academyId},#{title},#{time},#{content},#{address},#{pic},#{accessNum});
+	</insert>
+	
+	<update id="updateNew" parameterType="News">
+		update news set academyId=#{academyId},title=#{title},content=#{content},address=#{address},pic=#{pic},accessNum=#{accessNum}
+		where id = #{id}
+	</update>
+	
+
+	
+	<!--批量插入新闻  -->
+	<insert id="insertNewsList" parameterType="java.util.List">
+		insert into news (academyId,title,time,content,address,pic,accessNum) values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.academyId},#{item.title},#{item.time},#{item.content},#{item.address},#{item.pic},#{item.accessNum})
+		</foreach>
+	</insert>
+
+	<!-- 删除所有新闻 -->
+	<delete id="deleteAllNews">
+		<!--清空全部数据，不写日志，不可恢复，速度极快 -->
+		truncate table news;
+	</delete>
+
+	
+</mapper>

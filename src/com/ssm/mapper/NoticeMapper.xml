@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.mapper.NoticeMapper">
+  
+  
+  <update id="updateNotice" parameterType="Notice">
+		update notice set academyId=#{academyId},title=#{title},content=#{content},address=#{address},accessNum=#{accessNum}
+		where id = #{id}
+	</update>
+  
+  <!--测试所用根据id查询 -->
+  <select id="findNoticeById" parameterType="int"
+  	resultType="com.ssm.po.Notice">
+  		select * from notice where id = #{id}
+  	</select>
+  	
+  	<!-- 根据content查找通知id -->
+	<select id="findNoticeId" parameterType="String" resultType="int">
+		select id from notice where content = #{content}
+	</select>
+  	
+  	<!-- 根据学院id查找通知 -->
+  	<select id="findNoticeByAcademyId" parameterType="int"
+  		resultMap="notices">
+  		select * from notice where academyId = #{academyId} order by id desc
+  	</select>
+  	
+  	<!-- 根据学院id查找最后一条通知 -->
+  	<select id="findOneNoticeByAcademyId" parameterType="int"
+  		resultType="com.ssm.po.Notice">
+  		select * from notice where id = (select max(id) from notice where academyId=#{academyId})
+  	</select>
+  	
+  	<!-- 根据学院id查找通知条数 -->
+  	<select id="countNoticeByAcademy" parameterType="int"
+  		resultType="int">
+  		select count(id) from notice where academyId = #{academyId}
+  	</select>
+  	
+  	<resultMap type="Notice" id="notices">
+  		<id column="id" property="id"/>
+  		<result column="academyId" property="academyId"/>
+  		<result column="title" property="title"/>
+  		<result column="time" property="time"/>
+  		<result column="content" property="content"/>
+  		<result column="address" property="address"/>
+  		<result column="accessNum" property="accessNum"/>
+  	</resultMap>
+  	
+  	<select id="findAllNotices" resultMap="notices">
+  		select * from notice
+  	</select>
+  
+  
+  <!-- 删除notice表中的所有数据-->
+  <delete id="deleteAllNotice" >
+  		truncate table notice 
+  </delete>
+  
+  
+  	
+  	<!--添加一条notice表中的数据 -->
+  	<insert id="insertNotice" parameterType="com.ssm.po.Notice">
+  		insert into notice (academyId,title,time,content,address,accessNum) 
+  			value(#{academyId},#{title},#{time},#{content},#{address},#{accessNum})
+  	</insert>
+  	
+  	<!-- 添加多条notice表数据 -->
+  	<insert id="insertNoticesList" parameterType="java.util.List">
+  		insert  into notice (academyId,title,time,content,address,accessNum)  values
+  		<foreach collection="list" index="index" item="item" separator=",">
+  			(#{item.academyId},#{item.title},#{item.time},#{item.content},#{item.address},#{item.accessNum})
+  		</foreach>
+  	</insert>
+  	
+</mapper>
